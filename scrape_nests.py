@@ -36,17 +36,17 @@ if __name__ == '__main__':
     for result in results:
         print(result)
 
-with open('bird_database.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(['Name', 'Scientific Name', 'Description'])
-    for bird in birds:
-        name = bird.a.get_text()
-        scientific_name = bird.em.get_text()
+# with open('bird_database.csv', 'w', newline='') as csvfile:
+#     writer = csv.writer(csvfile)
+#     writer.writerow(['Name', 'Scientific Name', 'Description'])
+#     for bird in birds:
+#         name = bird.a.get_text()
+#         scientific_name = bird.em.get_text()
 
-        bird_url = 'https://www.allaboutbirds.org' + bird.a.get('href')
-        bird_page = requests.get(bird_url, headers=headers)
-        # Bird soup sounds a bit..... violent?
-        bird_soup = BeautifulSoup(bird_page.content, 'html.parser')
-        description = bird_soup.find('p').get_text()
-        writer.writerow([name, scientific_name, description])
+#         bird_url = 'https://www.allaboutbirds.org' + bird.a.get('href')
+#         bird_page = requests.get(bird_url, headers=headers)
+#         # Bird soup sounds a bit..... violent?
+#         bird_soup = BeautifulSoup(bird_page.content, 'html.parser')
+#         description = bird_soup.find('p').get_text()
+#         writer.writerow([name, scientific_name, description])
 
