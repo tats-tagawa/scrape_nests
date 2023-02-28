@@ -6,7 +6,9 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 headers = {'User-Agent':'Mozilla/5.0'}
 
 def get_bird_urls():
+    # Use second URL when testing, as it is much smaller list
     URL = 'https://www.allaboutbirds.org/guide/browse/taxonomy'
+    # URL = 'https://www.allaboutbirds.org/guide/browse/taxonomy/Podicipedidae'
     page = requests.get(URL, headers=headers)
 
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -20,8 +22,13 @@ def get_bird_urls():
 def get_bird_data(url):
     bird_page = requests.get(url, headers=headers)
     soup = BeautifulSoup(bird_page.content, 'html.parser')
-    description = soup.find('p').get_text()
-    return description
+    species_info = soup.find('div','speciesInfoCard')
+
+    name = species_info.span.get_text()
+    scientific_name = species_info.em.get_text()
+    description = species_info.p.get_text()
+
+    return [name, scientific_name, description]
 
 def get_all_bird_data(urls):
     with ProcessPoolExecutor(max_workers=4) as executor:
@@ -31,22 +38,15 @@ def get_all_bird_data(urls):
             results.append(future.result())
         return results
 
+def write_to_csv(birds):
+    with open('bird_database.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Name', 'Scientific Name', 'Description'])
+        for bird in birds:
+            writer.writerow(bird)
+
 if __name__ == '__main__':
-    results = get_all_bird_data(get_bird_urls())
-    for result in results:
-        print(result)
-
-# with open('bird_database.csv', 'w', newline='') as csvfile:
-#     writer = csv.writer(csvfile)
-#     writer.writerow(['Name', 'Scientific Name', 'Description'])
-#     for bird in birds:
-#         name = bird.a.get_text()
-#         scientific_name = bird.em.get_text()
-
-#         bird_url = 'https://www.allaboutbirds.org' + bird.a.get('href')
-#         bird_page = requests.get(bird_url, headers=headers)
-#         # Bird soup sounds a bit..... violent?
-#         bird_soup = BeautifulSoup(bird_page.content, 'html.parser')
-#         description = bird_soup.find('p').get_text()
-#         writer.writerow([name, scientific_name, description])
+    bird_urls = get_bird_urls()
+    birds_data = get_all_bird_data(bird_urls)
+    write_to_csv(birds_data)
 
