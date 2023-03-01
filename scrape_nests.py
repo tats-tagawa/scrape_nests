@@ -28,7 +28,7 @@ def get_bird_urls_audubon():
         page_num += 1
     return bird_urls
 
-def get_bird_urls():
+def get_bird_urls_ebird():
     # Use second URL when testing, as it is much smaller list
     URL = 'https://www.allaboutbirds.org/guide/browse/taxonomy'
     # URL = 'https://www.allaboutbirds.org/guide/browse/taxonomy/Podicipedidae'
@@ -42,7 +42,7 @@ def get_bird_urls():
         bird_urls.append(bird_url)
     return bird_urls
         
-def get_bird_data(url):
+def get_bird_data_ebird(url):
     bird_page = requests.get(url, headers=headers)
     soup = BeautifulSoup(bird_page.content, 'html.parser')
     species_info = soup.find('div','speciesInfoCard')
@@ -55,7 +55,7 @@ def get_bird_data(url):
 
 def get_all_bird_data(urls):
     with ProcessPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(get_bird_data, url) for url in urls]
+        futures = [executor.submit(get_bird_data_ebird, url) for url in urls]
         results = []
         for future in as_completed(futures):
             results.append(future.result())
