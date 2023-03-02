@@ -41,7 +41,15 @@ def get_bird_urls_ebird():
         bird_url = 'https://www.allaboutbirds.org' + bird.a.get('href')
         bird_urls.append(bird_url)
     return bird_urls
-        
+
+def get_bird_data_audubon(url):
+    bird_page = requests.get(url, headers=headers)
+    soup = BeautifulSoup(bird_page.content, 'html.parser')
+    name = soup.find('h1','common-name').get_text().strip()
+    scientific_name = soup.find('p','scientific-name').get_text().strip()
+    description = soup.find('section','bird-guide-section').find('div','columns').get_text().strip()
+    return [name, scientific_name, description]
+
 def get_bird_data_ebird(url):
     bird_page = requests.get(url, headers=headers)
     soup = BeautifulSoup(bird_page.content, 'html.parser')
@@ -55,21 +63,20 @@ def get_bird_data_ebird(url):
 
 def get_all_bird_data(urls):
     with ProcessPoolExecutor(max_workers=4) as executor:
-        futures = [executor.submit(get_bird_data_ebird, url) for url in urls]
+        futures = [executor.submit(get_bird_data_audubon, url) for url in urls]
         results = []
         for future in as_completed(futures):
             results.append(future.result())
         return results
 
 def write_to_csv(birds):
-    with open('bird_database.csv', 'w', newline='') as csvfile:
+    with open('bird_database_audubon.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Name', 'Scientific Name', 'Description'])
         for bird in birds:
             writer.writerow(bird)
 
-# if __name__ == '__main__':
-#     bird_urls = get_bird_urls_ebird()
-#     birds_data = get_all_bird_data(bird_urls)
-#     write_to_csv(birds_data)
-print(get_bird_urls_audubon())
+if __name__ == '__main__':
+    bird_urls = get_bird_urls_audubon()
+    birds_data = get_all_bird_data(bird_urls)
+    write_to_csv(birds_data)
