@@ -35,28 +35,27 @@ def get_bird_data_audubon(url):
     name = soup.find('h1','common-name').get_text(strip=True)
     scientific_name = soup.find('p','scientific-name').get_text(strip=True)
     description = soup.find('section','bird-guide-section').find('div','columns').get_text(strip=True)
-    print('* * * * * * * * * * *')
-    print(url)
-    print(name)
+
     # Get table with conservation status, family, and habitat information
-    # FIX: SOME BIRDS DON'T HAVE ALL THREE INFO
     info_table = soup.find('table','collapse')
-    bird_infos = info_table.find_all('td')
-    [conservation, family, habitat] = [info.get_text(strip=True) for info in bird_infos]
+
+    conservation = None
+    family = None
+    habitat = None
+
+    conservation_info = info_table.find('th',string='Conservation status')
+    if conservation_info:
+        conservation = conservation_info.find_next_sibling().get_text(strip=True)
+
+    family_info = info_table.find('th',string='Family')
+    if family_info:
+        family = family_info.find_next_sibling().get_text(strip=True)
+
+    habitat_info = info_table.find('th', string='Habitat')
+    if habitat_info:
+        habitat = habitat_info.find_next_sibling().get_text(strip=True)
+
     return [name, scientific_name, description, conservation, family, habitat]
-    # return [name, scientific_name, description]
-
-def soup_test():
-    URL = 'https://www.audubon.org/field-guide/bird/evening-grosbeak'
-    page = requests.get(URL, headers=headers)
-
-    soup = BeautifulSoup(page.content, 'html.parser')
-    table = soup.find('table','collapse')
-    bird_infos = table.find_all('td')
-    [conservation, family, habitat] = [bird.get_text(strip=True) for bird in bird_infos]
-    print(f'conservation: {conservation} | family: {family} | habitat: {habitat}')
-    
-# soup_test()
 
 def get_bird_urls_ebird():
     # Use second URL when testing, as it is much smaller list
@@ -94,7 +93,7 @@ def get_all_bird_data(urls):
 def write_to_csv(birds):
     with open('bird_database_audubon.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Name', 'Scientific Name', 'Description'])
+        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat'])
         for bird in birds:
             writer.writerow(bird)
 
