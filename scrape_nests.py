@@ -8,7 +8,7 @@ headers = {'User-Agent':'Mozilla/5.0'}
 
 def get_bird_urls_audubon():
     # Use page_num = 0 to get all birds
-    page_num = 24
+    page_num = 25
     bird_urls = []
 
     while (True):
@@ -28,6 +28,36 @@ def get_bird_urls_audubon():
         page_num += 1
     return bird_urls
 
+def get_bird_data_audubon(url):
+    bird_page = requests.get(url, headers=headers)
+    soup = BeautifulSoup(bird_page.content, 'html.parser')
+
+    name = soup.find('h1','common-name').get_text(strip=True)
+    scientific_name = soup.find('p','scientific-name').get_text(strip=True)
+    description = soup.find('section','bird-guide-section').find('div','columns').get_text(strip=True)
+    print('* * * * * * * * * * *')
+    print(url)
+    print(name)
+    # Get table with conservation status, family, and habitat information
+    # FIX: SOME BIRDS DON'T HAVE ALL THREE INFO
+    info_table = soup.find('table','collapse')
+    bird_infos = info_table.find_all('td')
+    [conservation, family, habitat] = [info.get_text(strip=True) for info in bird_infos]
+    return [name, scientific_name, description, conservation, family, habitat]
+    # return [name, scientific_name, description]
+
+def soup_test():
+    URL = 'https://www.audubon.org/field-guide/bird/evening-grosbeak'
+    page = requests.get(URL, headers=headers)
+
+    soup = BeautifulSoup(page.content, 'html.parser')
+    table = soup.find('table','collapse')
+    bird_infos = table.find_all('td')
+    [conservation, family, habitat] = [bird.get_text(strip=True) for bird in bird_infos]
+    print(f'conservation: {conservation} | family: {family} | habitat: {habitat}')
+    
+# soup_test()
+
 def get_bird_urls_ebird():
     # Use second URL when testing, as it is much smaller list
     URL = 'https://www.allaboutbirds.org/guide/browse/taxonomy'
@@ -41,14 +71,6 @@ def get_bird_urls_ebird():
         bird_url = 'https://www.allaboutbirds.org' + bird.a.get('href')
         bird_urls.append(bird_url)
     return bird_urls
-
-def get_bird_data_audubon(url):
-    bird_page = requests.get(url, headers=headers)
-    soup = BeautifulSoup(bird_page.content, 'html.parser')
-    name = soup.find('h1','common-name').get_text().strip()
-    scientific_name = soup.find('p','scientific-name').get_text().strip()
-    description = soup.find('section','bird-guide-section').find('div','columns').get_text().strip()
-    return [name, scientific_name, description]
 
 def get_bird_data_ebird(url):
     bird_page = requests.get(url, headers=headers)
