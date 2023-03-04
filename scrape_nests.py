@@ -32,10 +32,9 @@ def get_bird_data_audubon(url):
     bird_page = requests.get(url, headers=headers)
     soup = BeautifulSoup(bird_page.content, 'html.parser')
 
-    name = soup.find('h1','common-name').get_text(strip=True)
-    scientific_name = soup.find('p','scientific-name').get_text(strip=True)
-    description = soup.find('section','bird-guide-section').find('div','columns').get_text(strip=True)
-
+    name = None
+    scientific_name = None
+    description = None
     conservation_status = None
     family = None
     habitat = None
@@ -43,38 +42,52 @@ def get_bird_data_audubon(url):
     eggs = None
     young = None
 
-    # Get table with conservation_status status, family, and habitat information
+    # Get div with all bird info
     bird_card = soup.find('div','bird-guide-card')
 
-    conservation_info = bird_card.find('th',string='Conservation status')
-    if conservation_info:
-        conservation_status = conservation_info.find_next_sibling().get_text(strip=True)
+    # Some birds do not have all info. Check if data is available before assigning.
 
-    family_info = bird_card.find('th',string='Family')
-    if family_info:
-        family = family_info.find_next_sibling().get_text(strip=True)
+    name_el = bird_card.find('h1','common-name')
+    if name_el:
+        name = name_el.get_text(strip=True)
 
-    habitat_info = bird_card.find('th', string='Habitat')
-    if habitat_info:
-        habitat = habitat_info.find_next_sibling().get_text(strip=True)
+    scientific_name_el = bird_card.find('p','scientific-name')
+    if scientific_name_el:
+        scientific_name = scientific_name_el.get_text(strip=True)
     
-    feeding_info = bird_card.find('h2',string='Feeding Behavior')
-    if feeding_info:
-        feeding_behavior = feeding_info.find_next_sibling().get_text(strip=True)
+    description_el = bird_card.find('section','bird-guide-section').find('div','columns')
+    if description_el:
+        description = description_el.get_text(strip=True)
 
-    eggs_info = bird_card.find('h2',string='Eggs')
-    if eggs_info:
-        eggs = eggs_info.find_next_sibling().get_text(strip=True)
+    conservation_el = bird_card.find('th',string='Conservation status')
+    if conservation_el:
+        conservation_status = conservation_el.find_next_sibling().get_text(strip=True)
+
+    family_el = bird_card.find('th',string='Family')
+    if family_el:
+        family = family_el.find_next_sibling().get_text(strip=True)
+
+    habitat_el = bird_card.find('th', string='Habitat')
+    if habitat_el:
+        habitat = habitat_el.find_next_sibling().get_text(strip=True)
     
-    young_info = bird_card.find('h2',string='Young')
-    if young_info:
-        young = young_info.find_next_sibling().get_text(strip=True)
+    feeding_el = bird_card.find('h2',string='Feeding Behavior')
+    if feeding_el:
+        feeding_behavior = feeding_el.find_next_sibling().get_text(strip=True)
 
-    print(young)
-    return [name, scientific_name, description, conservation_status, family, habitat]
+    eggs_el = bird_card.find('h2',string='Eggs')
+    if eggs_el:
+        eggs = eggs_el.find_next_sibling().get_text(strip=True)
+    
+    young_el = bird_card.find('h2',string='Young')
+    if young_el:
+        young = young_el.find_next_sibling().get_text(strip=True)
 
+    return [name, scientific_name, description, conservation_status, family, habitat, feeding_behavior, eggs, young]
+
+# print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/wood-sandpiper'))
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
-get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak')
+# get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak')
 
 def get_all_bird_data(urls):
     with ProcessPoolExecutor(max_workers=4) as executor:
@@ -87,11 +100,11 @@ def get_all_bird_data(urls):
 def write_to_csv(birds):
     with open('bird_database_audubon.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat'])
+        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat', 'Feeding Behavior', 'Eggs', 'Young'])
         for bird in birds:
             writer.writerow(bird)
 
-# if __name__ == '__main__':
-#     bird_urls = get_bird_urls_audubon()
-#     birds_data = get_all_bird_data(bird_urls)
-#     write_to_csv(birds_data)
+if __name__ == '__main__':
+    bird_urls = get_bird_urls_audubon()
+    birds_data = get_all_bird_data(bird_urls)
+    write_to_csv(birds_data)
