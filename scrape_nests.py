@@ -65,8 +65,12 @@ def get_bird_data_audubon(url):
     eggs_info = bird_card.find('h2',string='Eggs')
     if eggs_info:
         eggs = eggs_info.find_next_sibling().get_text(strip=True)
+    
+    young_info = bird_card.find('h2',string='Young')
+    if young_info:
+        young = young_info.find_next_sibling().get_text(strip=True)
 
-    print(eggs)
+    print(young)
     return [name, scientific_name, description, conservation_status, family, habitat]
 
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
