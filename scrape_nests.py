@@ -36,26 +36,37 @@ def get_bird_data_audubon(url):
     scientific_name = soup.find('p','scientific-name').get_text(strip=True)
     description = soup.find('section','bird-guide-section').find('div','columns').get_text(strip=True)
 
-    # Get table with conservation status, family, and habitat information
-    info_table = soup.find('table','collapse')
-
-    conservation = None
+    conservation_status = None
     family = None
     habitat = None
+    feeding_behavior = None
+    Eggs = None
+    Young = None
 
-    conservation_info = info_table.find('th',string='Conservation status')
+    # Get table with conservation_status status, family, and habitat information
+    bird_card = soup.find('div','bird-guide-card')
+
+    conservation_info = bird_card.find('th',string='Conservation status')
     if conservation_info:
-        conservation = conservation_info.find_next_sibling().get_text(strip=True)
+        conservation_status = conservation_info.find_next_sibling().get_text(strip=True)
 
-    family_info = info_table.find('th',string='Family')
+    family_info = bird_card.find('th',string='Family')
     if family_info:
         family = family_info.find_next_sibling().get_text(strip=True)
 
-    habitat_info = info_table.find('th', string='Habitat')
+    habitat_info = bird_card.find('th', string='Habitat')
     if habitat_info:
         habitat = habitat_info.find_next_sibling().get_text(strip=True)
+    
+    feeding_info = bird_card.find('h2',string='Feeding Behavior')
+    if feeding_info:
+        feeding_behavior = feeding_info.find_next_sibling().get_text(strip=True)
 
-    return [name, scientific_name, description, conservation, family, habitat]
+    print(feeding_behavior)
+    return [name, scientific_name, description, conservation_status, family, habitat]
+
+# print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
+get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak')
 
 def get_all_bird_data(urls):
     with ProcessPoolExecutor(max_workers=4) as executor:
@@ -72,7 +83,7 @@ def write_to_csv(birds):
         for bird in birds:
             writer.writerow(bird)
 
-if __name__ == '__main__':
-    bird_urls = get_bird_urls_audubon()
-    birds_data = get_all_bird_data(bird_urls)
-    write_to_csv(birds_data)
+# if __name__ == '__main__':
+#     bird_urls = get_bird_urls_audubon()
+#     birds_data = get_all_bird_data(bird_urls)
+#     write_to_csv(birds_data)
