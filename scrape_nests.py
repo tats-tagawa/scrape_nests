@@ -40,8 +40,8 @@ def get_bird_data_audubon(url):
     family = None
     habitat = None
     feeding_behavior = None
-    Eggs = None
-    Young = None
+    eggs = None
+    young = None
 
     # Get table with conservation_status status, family, and habitat information
     bird_card = soup.find('div','bird-guide-card')
@@ -62,7 +62,11 @@ def get_bird_data_audubon(url):
     if feeding_info:
         feeding_behavior = feeding_info.find_next_sibling().get_text(strip=True)
 
-    print(feeding_behavior)
+    eggs_info = bird_card.find('h2',string='Eggs')
+    if eggs_info:
+        eggs = eggs_info.find_next_sibling().get_text(strip=True)
+
+    print(eggs)
     return [name, scientific_name, description, conservation_status, family, habitat]
 
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
