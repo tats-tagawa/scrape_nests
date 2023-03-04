@@ -83,7 +83,7 @@ def get_bird_data_audubon(url):
     if young_el:
         young = young_el.find_next_sibling().get_text(strip=True)
 
-    return [name, scientific_name, description, conservation_status, family, habitat, feeding_behavior, eggs, young]
+    return [name, scientific_name, description, conservation_status, family, habitat, feeding_behavior, eggs, young, url]
 
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/wood-sandpiper'))
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
@@ -100,7 +100,7 @@ def get_all_bird_data(urls):
 def write_to_csv(birds):
     with open('bird_database_audubon.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat', 'Feeding Behavior', 'Eggs', 'Young'])
+        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat', 'Feeding Behavior', 'Eggs', 'Young', 'URL'])
         for bird in birds:
             writer.writerow(bird)
 
