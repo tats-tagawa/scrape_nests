@@ -41,6 +41,7 @@ def get_bird_data_audubon(url):
     feeding_behavior = None
     eggs = None
     young = None
+    diet = None
 
     # Get div with all bird info
     bird_card = soup.find('div','bird-guide-card')
@@ -83,10 +84,14 @@ def get_bird_data_audubon(url):
     if young_el:
         young = young_el.find_next_sibling().get_text(strip=True)
 
-    return [name, scientific_name, description, conservation_status, family, habitat, feeding_behavior, eggs, young, url]
+    diet_el = bird_card.find('h2',string='Diet')
+    if diet_el:
+        diet = diet_el.find_next_sibling().get_text(strip=True)
+
+    return [name, scientific_name, description, conservation_status, family, habitat, feeding_behavior, eggs, young, diet, url]
 
 # print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/wood-sandpiper'))
-# print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
+print(get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak'))
 # get_bird_data_audubon('https://www.audubon.org/field-guide/bird/evening-grosbeak')
 
 def get_all_bird_data(urls):
@@ -100,11 +105,11 @@ def get_all_bird_data(urls):
 def write_to_csv(birds):
     with open('bird_database_audubon.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat', 'Feeding Behavior', 'Eggs', 'Young', 'URL'])
+        writer.writerow(['Name', 'Scientific Name', 'Description', 'Conservation Status', 'Family', 'Habitat', 'Feeding Behavior', 'Eggs', 'Young', 'Diet', 'URL'])
         for bird in birds:
             writer.writerow(bird)
 
-if __name__ == '__main__':
-    bird_urls = get_bird_urls_audubon()
-    birds_data = get_all_bird_data(bird_urls)
-    write_to_csv(birds_data)
+# if __name__ == '__main__':
+#     bird_urls = get_bird_urls_audubon()
+#     birds_data = get_all_bird_data(bird_urls)
+#     write_to_csv(birds_data)
