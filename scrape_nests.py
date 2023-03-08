@@ -1,6 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import re
 import csv
+import sqlite3
 import requests
 from bs4 import BeautifulSoup
 
@@ -134,25 +135,47 @@ def get_all_bird_data(urls):
         return results
 
 
-def write_to_csv(birds):
-    """Write data of all birds to a csv file and save on disk"""
-    with open(
-            'bird_database_audubon.csv',
-            mode='w',
-            newline='',
-            encoding='UTF-8'
-        ) as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([
-            'Name', 'Scientific Name', 'Description',
-            'Conservation Status', 'Family', 'Habitat',
-            'Feeding Behavior', 'Eggs', 'Young', 'Diet',
-            'Nesting', 'Migration', 'Songs and Calls', 'URL'
-        ])
-        for bird in birds:
-            writer.writerow(bird)
+# def write_to_csv(birds):
+#     """Write data of all birds to a csv file and save on disk"""
+#     with open(
+#             'bird_database_audubon.csv',
+#             mode='w',
+#             newline='',
+#             encoding='UTF-8'
+#         ) as csvfile:
+#         writer = csv.writer(csvfile)
+#         writer.writerow([
+#             'Name', 'Scientific Name', 'Description',
+#             'Conservation Status', 'Family', 'Habitat',
+#             'Feeding Behavior', 'Eggs', 'Young', 'Diet',
+#             'Nesting', 'Migration', 'Songs and Calls', 'URL'
+#         ])
+#         for bird in birds:
+#             writer.writerow(bird)
 
-if __name__ == '__main__':
-    bird_urls = get_bird_urls_audubon()
-    birds_data = get_all_bird_data(bird_urls)
-    write_to_csv(birds_data)
+# if __name__ == '__main__':
+#     bird_urls = get_bird_urls_audubon()
+#     birds_data = get_all_bird_data(bird_urls)
+#     write_to_csv(birds_data)
+
+def write_to_sqlite():
+    connection = sqlite3.connect('birds.db')
+    cursor = connection.cursor()
+    cursor.execute(
+        'CREATE TABLE bird ( \
+            name TEXT, \
+            scientific_name TEXT \
+            description TEXT \
+            conservation_status TEXT \
+            family TEXT \
+            habitat TEXT \
+            feeding_behavior TEXT \
+            eggs TEXT \
+            young TEXT \
+            diet TEXT \
+            nesting TEXT \
+            migration TEXT \
+            songs TEXT \
+            url TEXT \
+        )'
+    )
