@@ -153,29 +153,41 @@ def get_all_bird_data(urls):
 #         for bird in birds:
 #             writer.writerow(bird)
 
-# if __name__ == '__main__':
-#     bird_urls = get_bird_urls_audubon()
-#     birds_data = get_all_bird_data(bird_urls)
-#     write_to_csv(birds_data)
-
-def write_to_sqlite():
+def create_birds_table():
+    """Create birds SQLite table"""
     connection = sqlite3.connect('birds.db')
     cursor = connection.cursor()
     cursor.execute(
-        'CREATE TABLE bird ( \
+        'CREATE TABLE birds ( \
             name TEXT, \
-            scientific_name TEXT \
-            description TEXT \
-            conservation_status TEXT \
-            family TEXT \
-            habitat TEXT \
-            feeding_behavior TEXT \
-            eggs TEXT \
-            young TEXT \
-            diet TEXT \
-            nesting TEXT \
-            migration TEXT \
-            songs TEXT \
+            scientific_name TEXT, \
+            description TEXT, \
+            conservation_status TEXT, \
+            family TEXT, \
+            habitat TEXT, \
+            feeding_behavior TEXT, \
+            eggs TEXT, \
+            young TEXT, \
+            diet TEXT, \
+            nesting TEXT, \
+            migration TEXT, \
+            songs TEXT, \
             url TEXT \
         )'
     )
+
+def write_bird_data(all_bird_data):
+    """Write all bird data into birds table"""
+    connection = sqlite3.connect('birds.db')
+    cursor = connection.cursor()
+
+    cursor.executemany('INSERT INTO birds VALUES( \
+                       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? \
+                    )', all_bird_data)
+    connection.commit()
+
+if __name__ == '__main__':
+    bird_urls = get_bird_urls_audubon()
+    all_bird_data = get_all_bird_data(bird_urls)
+    write_bird_data(all_bird_data)
+    # write_to_csv(birds_data)
