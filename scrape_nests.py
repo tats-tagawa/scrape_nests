@@ -1,20 +1,9 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
-import re
 import csv
 import sqlite3
 from scrape_audubon import get_bird_urls_audubon, get_bird_data_audubon
 
 headers = {'User-Agent': 'Mozilla/5.0'}
-
-# print(get_bird_data_audubon(
-#     'https://www.audubon.org/field-guide/bird/wood-sandpiper'
-# ))
-# print(get_bird_data_audubon(
-#     'https://www.audubon.org/field-guide/bird/evening-grosbeak'
-# ))
-# get_bird_data_audubon(
-#     'https://www.audubon.org/field-guide/bird/evening-grosbeak'
-# )
 
 def scrape_all_bird_data(urls):
     """Get information of all birds listed in the audubon website"""
@@ -79,6 +68,7 @@ def clear_birds_table():
     connection.close()
 
 def reset_bird_table_sequence():
+    """Resets auto-increment sequence for birds.db to 0"""
     connection = sqlite3.connect('birds.db')
     cursor = connection.cursor()
     table_name = 'birds'
