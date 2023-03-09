@@ -50,6 +50,7 @@ def create_birds_table():
     cursor = connection.cursor()
     cursor.execute(
         'CREATE TABLE birds ( \
+            id INTEGER PRIMARY KEY, \
             name TEXT, \
             scientific_name TEXT, \
             description TEXT, \
@@ -72,7 +73,22 @@ def write_bird_data(all_bird_data):
     connection = sqlite3.connect('birds.db')
     cursor = connection.cursor()
 
-    cursor.executemany('INSERT INTO birds VALUES( \
+    cursor.executemany('INSERT INTO birds( \
+                        name, \
+                        scientific_name, \
+                        description, \
+                        conservation_status, \
+                        family, \
+                        habitat, \
+                        feeding_behavior, \
+                        eggs, \
+                        young, \
+                        diet, \
+                        nesting, \
+                        migration, \
+                        songs, \
+                        url) \
+                    VALUES( \
                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? \
                     )', all_bird_data)
     connection.commit()
