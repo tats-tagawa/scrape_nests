@@ -16,7 +16,7 @@ headers = {'User-Agent': 'Mozilla/5.0'}
 #     'https://www.audubon.org/field-guide/bird/evening-grosbeak'
 # )
 
-def get_all_bird_data(urls):
+def scrape_all_bird_data(urls):
     """Get information of all birds listed in the audubon website"""
     with ProcessPoolExecutor(max_workers=4) as executor:
         futures = [executor.submit(get_bird_data_audubon, url) for url in urls]
@@ -67,6 +67,24 @@ def create_birds_table():
             url TEXT \
         )'
     )
+    connection.commit()
+    connection.close()
+
+def clear_birds_table():
+    """Clear all bird data from table"""
+    connection = sqlite3.connect('birds.db')
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM birds')
+    connection.commit()
+    connection.close()
+
+def reset_bird_table_sequence():
+    connection = sqlite3.connect('birds.db')
+    cursor = connection.cursor()
+    table_name = 'birds'
+    cursor.execute('UPDATE sqlite_sequence SET seq=0 WHERE name=?',(table_name,))
+    connection.commit()
+    connection.close()
 
 def write_bird_data(all_bird_data):
     """Write all bird data into birds table"""
@@ -92,9 +110,10 @@ def write_bird_data(all_bird_data):
                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? \
                     )', all_bird_data)
     connection.commit()
+    connection.close()
 
 if __name__ == '__main__':
     bird_urls = get_bird_urls_audubon()
-    all_bird_data = get_all_bird_data(bird_urls)
+    all_bird_data = scrape_all_bird_data(bird_urls)
     write_bird_data(all_bird_data)
     # write_to_csv(birds_data)
