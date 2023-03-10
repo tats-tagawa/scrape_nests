@@ -4,15 +4,14 @@ from bs4 import BeautifulSoup
 
 headers = {'User-Agent': 'Mozilla/5.0'}
 
-def get_bird_urls_audubon(pages=25):
+def get_bird_urls_audubon():
     """Get all urls for pages of listed birds"""
     # Use page_num = 0 to get all birds
-    page_num = pages
+    page_num = 0
     bird_urls = []
 
     while True:
         url = f'https://www.audubon.org/bird-guide?page={page_num}'
-        print(url)
         page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, 'html.parser')
         # Stop loop if there are no more birds to load

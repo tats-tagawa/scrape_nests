@@ -76,8 +76,11 @@ def reset_bird_table_sequence():
     connection.commit()
     connection.close()
 
-def write_bird_data(all_bird_data):
+def write_bird_data():
     """Write all bird data into birds table"""
+    bird_urls = get_bird_urls_audubon()
+    all_bird_data = scrape_all_bird_data(bird_urls)
+
     connection = sqlite3.connect('birds.db')
     cursor = connection.cursor()
 
@@ -103,7 +106,5 @@ def write_bird_data(all_bird_data):
     connection.close()
 
 if __name__ == '__main__':
-    bird_urls = get_bird_urls_audubon()
-    all_bird_data = scrape_all_bird_data(bird_urls)
-    write_bird_data(all_bird_data)
+    write_bird_data()
     # write_to_csv(birds_data)
